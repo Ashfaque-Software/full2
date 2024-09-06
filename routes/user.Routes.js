@@ -5,21 +5,37 @@ const userModel = require("../models/user.Model");
 
 const userRouter = express.Router();
 
-userRouter.post("/register", async (req, res) => {
-    const { name, email, password } = req.body;
+userRouter.post("/signup", async (req, res) => {
+    const {email, password,cpassword } = req.body;
+    let user = await userModel.findOne({ email });
+
+    if (user) {
+        return res.status(400).json({ message: "user is already exist" })
+    }
+
     try {
+
         bcrypt.hash(password, 5, async (err, hash) => {
             if (err) {
-                return res.status(500).json({ msg: "Error in hashing password" });
+                res.status(400).json({ message: "error hashing password" })
             }
-            const user = new userModel({ name, email, password: hash});
-            await user.save();
-            res.status(201).json({ msg: "User registered successfully" });
+            else {
+                let token = jwt.sign({ email: email }, process.env.SECRET_KEY);
+                let user = new userModel({
+                    email,
+                    password: hash,
+                    cpassword:hash
+                })
+                await user.save();
+                res.status(200).json({ message: "user registered successfully", token })
+            }
+
         });
     } catch (error) {
-        res.status(501).json({ msg: `Internal server error: ${error.message}` });
+        res.status(400).json({ message: "error while registering" })
     }
-});
+
+})
 
 userRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
