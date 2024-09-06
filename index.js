@@ -3,7 +3,6 @@ const connection = require("./config/db");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const userRouter = require("./routes/user.Routes");
-const noteRouter = require("./routes/note.Routes");
 const snacksRouter=require("./routes/snacksRouter")
 const orderRouter=require("./routes/orderRouter")
 const detergentRouter=require("./routes/detergentRouter")
@@ -16,7 +15,6 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 app.use("/user", userRouter);
-app.use("/note", noteRouter);
 app.use("/detergent", detergentRouter);
 app.use("/snacks", snacksRouter);
 app.use("/order", orderRouter);
